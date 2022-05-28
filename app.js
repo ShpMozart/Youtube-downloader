@@ -23,11 +23,7 @@ bot.on("message", (ctx) => {
         {}
       );
     })
-    .on("resume", () => {
-      if (!errorHappened) {
-        bot.telegram.sendMessage(ctx.chat.id, "loading.... 🐢", {});
-      }
-    })
+
     .pipe(fs.createWriteStream(`${ctx.from.id}.mp4`))
     .on("finish", () => {
       ctx.replyWithVideo({ source: `${ctx.from.id}.mp4` }).then(() => {
