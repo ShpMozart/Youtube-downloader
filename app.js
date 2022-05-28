@@ -8,15 +8,34 @@ bot.command("start", (ctx) => {
   bot.telegram.sendMessage(ctx.chat.id, "Send me your url 😾", {});
 });
 bot.on("message", (ctx) => {
-  const url = ctx.message.text;
+  let url = null;
+  let errorHappened = false;
+  url = ctx.message.text;
   ytdl(url, {
     quality: "18",
   })
+    .on("error", (err) => {
+      console.log(err);
+      errorHappened = true;
+      bot.telegram.sendMessage(
+        ctx.chat.id,
+        "Wtf dude send me valid youtube video url 🔪🩸",
+        {}
+      );
+    })
+    .on("resume", () => {
+      if (!errorHappened) {
+        bot.telegram.sendMessage(ctx.chat.id, "loading.... 🐢", {});
+      }
+    })
     .pipe(fs.createWriteStream(`${ctx.from.id}.mp4`))
     .on("finish", () => {
-      ctx.replyWithVideo({ source: `${ctx.from.id}.mp4` });
+      ctx.replyWithVideo({ source: `${ctx.from.id}.mp4` }).then(() => {
+        fs.unlinkSync(`${ctx.from.id}.mp4`, (err) => {
+          console.log(err);
+        });
+      });
     });
-
-  bot.telegram.sendMessage(ctx.chat.id, "loading.... 🐢", {});
 });
+
 bot.launch();

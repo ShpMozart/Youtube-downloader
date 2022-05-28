@@ -9,8 +9,10 @@
   "author": "mozart",
   "license": "ISC",
   "dependencies": {
+    "fluent-ffmpeg": "^2.1.2",
     "node-video-resize": "^1.0.1",
     "telegraf": "^4.8.2",
+    "video-to-audio": "^1.0.1",
     "ytdl-core": "^4.11.0"
   }
 }
