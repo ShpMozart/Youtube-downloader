@@ -7,14 +7,19 @@ bot.command("start", (ctx) => {
   console.log(ctx.from);
   bot.telegram.sendMessage(ctx.chat.id, "Send me your url 😾", {});
 });
-bot.on("message", (ctx) => {
-  let url = null;
-  let errorHappened = false;
-  url = ctx.message.text;
+
+let url = null;
+let errorHappened = false;
+let waiting = false;
+bot.command("ss", Telegraf.reply("λ"));
+
+bot.command("mp3", (ctx) => {
   ytdl(url, {
-    quality: "18",
+    quality: "140",
   })
     .on("error", (err) => {
+      waiting = false;
+
       console.log(err);
       errorHappened = true;
       bot.telegram.sendMessage(
@@ -23,9 +28,36 @@ bot.on("message", (ctx) => {
         {}
       );
     })
+    .pipe(fs.createWriteStream(`${ctx.from.id}.mp3`))
+    .on("finish", () => {
+      ctx.replyWithAudio({ source: `${ctx.from.id}.mp3` }).then(() => {
+        waiting = false;
 
+        fs.unlinkSync(`${ctx.from.id}.mp3`, (err) => {
+          console.log(err);
+        });
+      });
+    });
+});
+bot.command("mp4", (ctx) => {
+  ytdl(url, {
+    quality: "18",
+  })
+    .on("error", (err) => {
+      waiting = false;
+
+      console.log(err);
+      errorHappened = true;
+      bot.telegram.sendMessage(
+        ctx.chat.id,
+        "Wtf dude send me valid youtube video url 🔪🩸",
+        {}
+      );
+    })
     .pipe(fs.createWriteStream(`${ctx.from.id}.mp4`))
     .on("finish", () => {
+      waiting = false;
+
       ctx.replyWithVideo({ source: `${ctx.from.id}.mp4` }).then(() => {
         fs.unlinkSync(`${ctx.from.id}.mp4`, (err) => {
           console.log(err);
@@ -34,6 +66,15 @@ bot.on("message", (ctx) => {
     });
 });
 
+bot.on("message", (ctx) => {
+  if (!waiting) {
+    waiting = true;
+    ctx.reply("🎙 /mp3 ---- 🎥 /mp4 ");
+    url = ctx.message.text;
+  } else {
+    console.log("----");
+  }
+});
 bot.launch();
 
 const express = require("express");
