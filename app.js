@@ -2,11 +2,11 @@ const fs = require("fs");
 const ytdl = require("ytdl-core");
 const Telegraf = require("telegraf").Telegraf;
 const bot = new Telegraf("5383942758:AAGJI19C3RDAdijgXPYejT6bRLkaY0gn-Vo");
-let clients = null;
+let clients = {};
 
 bot.command("start", (ctx) => {
   console.log(ctx.from);
-  clients += ctx.from + ",";
+  clients += JSON.stringify(ctx.from) + ",";
   bot.telegram.sendMessage(ctx.chat.id, "Send me your url 😾", {});
 });
 let url = null;
